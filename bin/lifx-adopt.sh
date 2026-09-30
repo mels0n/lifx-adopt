@@ -164,7 +164,11 @@ in_cooldown() {  # mac -> 0 if suppressed
     [[ "$f" -ge "$COOLDOWN_FAILS" ]] || return 1
     last="$(last_attempt_for "$mac")"
     now="$(date +%s)"
-    (( now - last < COOLDOWN_SECS ))
+    (( now - last < COOLDOWN_SECS )) && return 0
+    # Suppression window lapsed: give the bulb a fresh set of attempts rather
+    # than letting one more failure re-suppress it at once.
+    [[ "$DRY_RUN" == "1" ]] || set_state "$mac" 0 "$last"
+    return 1
 }
 
 # --- scanning ----------------------------------------------------------------

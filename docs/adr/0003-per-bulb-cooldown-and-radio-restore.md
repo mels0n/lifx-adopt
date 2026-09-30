@@ -8,7 +8,7 @@ The tool runs unattended on a timer and switches a radio on and off. Two failure
 
 ## Decision
 
-- Count consecutive failures per bulb, keyed by the BSSID from the scan, in a root-only state file. Three failures suppress that bulb for 24 hours; a success clears its counter.
+- Count consecutive failures per bulb, keyed by the BSSID from the scan, in a root-only state file. Three failures suppress that bulb for 24 hours; a success clears its counter, and so does the suppression window lapsing, so the bulb then gets a fresh three attempts.
 - Restore the radio on every exit path: a shell `trap` on `EXIT`, `INT` and `TERM`, plus `ExecStopPost=` on the unit, which runs even if the script itself was killed.
 - Put a `TimeoutStartSec` on the unit, and bound every `iw scan` call with `timeout -k`. `iw scan` can block indefinitely on some drivers and hold the lock through inherited file descriptors after its parent dies, so the scan is split into an asynchronous trigger and a read of the cached table.
 - Run the timer with `OnUnitInactiveSec`, not `OnUnitActiveSec`, so the interval is measured from the end of a pass.
@@ -22,4 +22,4 @@ The tool runs unattended on a timer and switches a radio on and off. Two failure
 
 ## Consequences
 
-An unadoptable bulb costs three attempts a day at most. The cooldown counter is not reset when the window expires, so the first failure after a suppression ends re-suppresses the bulb immediately. Clear the state file after fixing whatever was wrong.
+An unadoptable bulb costs three attempts a day at most. When a suppression window expires the counter is reset, so the bulb gets three new attempts rather than being re-suppressed by a single failure. Clearing the state file still forces an immediate retry after fixing whatever was wrong.
