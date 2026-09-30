@@ -1,0 +1,11 @@
+[Unit]
+Description=Look for factory-reset LIFX bulbs every few minutes
+
+[Timer]
+OnBootSec=2min
+# Measured from the END of the previous run. A pass that adopts several bulbs
+# can take minutes; OnUnitActiveSec would let the next run come due mid-pass.
+OnUnitInactiveSec=5min
+
+[Install]
+WantedBy=timers.target

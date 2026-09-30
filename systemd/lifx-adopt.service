@@ -1,0 +1,14 @@
+[Unit]
+Description=Adopt factory-reset LIFX bulbs onto the home WiFi network
+ConditionPathExists=/opt/lifx-adopt/bin/lifx-adopt.sh
+ConditionPathExists=/etc/lifx-adopt/lifx-adopt.env
+
+[Service]
+Type=oneshot
+# Invoke through bash explicitly so the unit does not depend on the exec bit.
+ExecStart=/bin/bash /opt/lifx-adopt/bin/lifx-adopt.sh
+# Second line of defence: whatever happened, the radio ends up down. The leading
+# "-" ignores a failure here so it cannot mask the real exit status.
+ExecStopPost=-/bin/bash /opt/lifx-adopt/bin/lifx-adopt.sh --radio-down
+# A wedged association must never hold the radio indefinitely.
+TimeoutStartSec=600

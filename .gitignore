@@ -1,0 +1,12 @@
+# Local-only working files (never published)
+CLAUDE.md
+.claude/*
+!.claude/*.json
+.superpowers/
+docs/superpowers/
+scratch/
+memory/
+MEMORY.md
+
+.env
+secrets.yaml
